@@ -53,3 +53,15 @@ exports.deleteCategory = async (req, res) => {
   if (!category) return res.status(404).json({ error: "Category not found" });
   return res.status(200).json({ category, success: "Category deleted" });
 };
+exports.testCategory = async (req, res) => {
+  let category = await Category.findByIdAndDelete(req.params.id);
+
+  if (!category) return res.status(404).json({ error: "Category not found" });
+  return res.status(200).json({ category, success: "Category deleted" });
+};
+exports.test1Category = async (req, res) => {
+  let category = await Category.findByIdAndDelete(req.params.id);
+
+  if (!category) return res.status(404).json({ error: "Category not found" });
+  return res.status(200).json({ category, success: "Category deleted" });
+};
