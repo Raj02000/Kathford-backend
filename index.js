@@ -4,6 +4,7 @@ const cors = require("cors");
 const testroute = require("./routes/testroute");
 const categoryroute = require("./routes/CategoryRoute");
 const productroute = require("./routes/ProductRoutes");
+const userroute = require("./routes/UserRoutes.js");
 
 require("dotenv").config();
 app.use(cors());
@@ -17,3 +18,4 @@ app.listen(port, () => {
 app.use(testroute);
 app.use("/category", categoryroute);
 app.use("/product", productroute);
+app.use("/user", userroute);
