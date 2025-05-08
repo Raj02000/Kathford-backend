@@ -73,3 +73,29 @@ exports.deleteProduct = async (req, res) => {
   if (!product) return res.status(404).json({ error: "Product not found" });
   return res.status(200).json({ product, success: "Product deleted" });
 };
+exports.updateProduct = async (req, res) => {
+  try {
+    let product = await Product.findByIdAndUpdate(
+      req.params.id,
+      {
+        product_name: req.body.product_name,
+        price: req.body.price,
+        description: req.body.description,
+        quantity: req.body.quantity,
+        image: req.body.image,
+        category: req.body.category,
+      },
+      { new: true }
+    ).populate("category", "category_name");
+    if (!product) {
+      return res
+        .status(404)
+        .json({ error: "Product is not available to update" });
+    }
+    return res
+      .status(200)
+      .json({ product, success: "Product updated successfully" });
+  } catch (err) {
+    return res.status(400).json({ error: err.message });
+  }
+};

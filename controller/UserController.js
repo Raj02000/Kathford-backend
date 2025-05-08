@@ -2,6 +2,7 @@ const User = require("../model/UserModel");
 const crypto = require("crypto");
 const Token = require("../model/TokenModel");
 const sendEmail = require("../sendEmail");
+let jwt = require("jsonwebtoken");
 
 exports.register = async (req, res) => {
   // destructuring
@@ -82,7 +83,7 @@ exports.resendverification = async (req, res) => {
 };
 exports.forgetPassword = async (req, res) => {
   const { email } = req.body;
-  const user = User.findOne({ email: email });
+  const user = await User.findOne({ email: email });
   if (!user) {
     return res.status(400).json({ message: "User Not found" });
   }
@@ -107,11 +108,13 @@ exports.forgetPassword = async (req, res) => {
 };
 exports.changePassword = async (req, res) => {
   const { id } = req.params;
-  let token = Token.findOne({ token: id });
+  let token = await Token.findOne({ token: id });
   if (!token) {
     return res.status(400).json({ message: "Invalid Token" });
   }
-  let user = User.findOne({ user: token.user });
+  console.log(token);
+
+  let user = await User.findOne(token.user);
   if (!user) {
     return res.status(400).json({ message: "Invalid User" });
   }
@@ -121,4 +124,25 @@ exports.changePassword = async (req, res) => {
     return res.status(400).json({ message: "Something went wrong" });
   }
   return res.status(200).json({ message: "Password changed", user });
+};
+exports.signin = async (req, res) => {
+  const { email, password } = req.body;
+  let user = await User.findOne({ email: email });
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+  if (!user.authenticate(password)) {
+    return res.status(400).json({ message: "Password doesnot match" });
+  }
+  if (!user.isVerified) {
+    return res.status(400).json({ message: "Please Verify your account " });
+  }
+  let token = jwt.sign(
+    { id: user._id, name: user.name, role: user.role },
+    "Raj",
+    { expiresIn: "1h" }
+  );
+  return res
+    .status(200)
+    .json({ token: token, user: user, message: "Login Success" });
 };
